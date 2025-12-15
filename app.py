@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_autorefresh import st_autorefresh
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -11,9 +12,8 @@ SHEET_NAME = "Sheet1"
 st.set_page_config(page_title="Dashboard IoT Kapal", layout="wide")
 st.title("🚢 Dashboard IoT Kapal")
 st.caption("Auto refresh tiap 1 menit")
+st_autorefresh(interval=60_000, key="refresh")
 
-# Auto refresh 1 menit
-st.experimental_rerun()
 
 # ================= GOOGLE SHEET =================
 scope = [
