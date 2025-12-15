@@ -14,7 +14,7 @@ st.caption("Auto refresh tiap 1 menit")
 
 st_autorefresh(interval=60_000, key="refresh")
 
-# ================= GOOGLE SHEET (SECRETS) =================
+# ================= GOOGLE SHEET =================
 scope = [
     "https://spreadsheets.google.com/feeds",
     "https://www.googleapis.com/auth/drive"
@@ -34,9 +34,14 @@ df = pd.DataFrame(data)
 
 df["waktu"] = pd.to_datetime(df["waktu"])
 
+# pastikan kolom numerik
+df["suhu"] = pd.to_numeric(df["suhu"], errors="coerce")
+df["getaran"] = pd.to_numeric(df["getaran"], errors="coerce")
+df["oli"] = pd.to_numeric(df["oli"], errors="coerce")
+
 # ================= RESAMPLE 5 MENIT =================
 df_5m = (
-    df.set_index("waktu")
+    df.set_index("waktu")[["suhu", "getaran"]]
     .resample("5T")
     .mean()
     .reset_index()
@@ -53,6 +58,11 @@ with col2:
     st.subheader("📈 Getaran Mesin")
     st.line_chart(df_5m.set_index("waktu")["getaran"])
 
+# ================= STATUS TEKANAN OLI =================
 st.subheader("🛢 Status Tekanan Oli")
+
 df["oil_status"] = df["oli"].apply(lambda x: 1 if x == 1 else 0)
-st.scatter_chart(df.set_index("waktu")["oil_status"])
+
+st.scatter_chart(
+    df.set_index("waktu")["oil_status"]
+)
